@@ -1,18 +1,20 @@
-# User Registration Endpoint Documentation
+# User Endpoints Documentation
 
-## Endpoint
+## Registration Endpoint
+
+### Endpoint
 **POST** `/users/register`
 
 > **Note:** Although the prompt mentions `/user/register`, the actual route set in [userRoute.js](d:\uber\backend\routes\userRoute.js) is `/users/register`.
 
-## Description
+### Description
 This endpoint registers a new user into the system. It performs the following:
 - **Validates** the request payload to ensure all required fields are provided and meet the specified criteria.
 - **Hashes** the provided password using bcrypt before storing the user.
 - **Creates** a new user record in the database.
 - **Generates** a JSON Web Token (JWT) for authentication purposes.
 
-## Request Body
+### Request Body
 
 The endpoint expects a JSON payload in the following format:
 
@@ -27,9 +29,9 @@ The endpoint expects a JSON payload in the following format:
 }
 ```
 
-## Response
+### Response
 
-### Success Response
+#### Success Response
 
 - **Status Code:** `201 Created`
 - **Body:**
@@ -43,13 +45,13 @@ The endpoint expects a JSON payload in the following format:
           "firstname": "exampleFirstName",
           "lastname": "exampleLastName"
         },
-        "email": "user@example.com",
+        "email": "user@example.com"
         // other user fields if applicable...
       }
     }
     ```
 
-### Error Responses
+#### Error Responses
 
 1. **Validation Error:**
    - **Status Code:** `400 Bad Request`
@@ -69,18 +71,95 @@ The endpoint expects a JSON payload in the following format:
       ```
 
 2. **Missing Fields or Other Validation Failure:**
-   - The endpoint will throw an Error with a descriptive message if any of the required fields (`fullname.firstname`, `fullname.lastname`, `email`, `password`) are missing.
+   - The endpoint will throw an error with a descriptive message if any required fields (`fullname.firstname`, `fullname.lastname`, `email`, `password`) are missing.
+
+---
+
+## Login Endpoint
+
+### Endpoint
+**POST** `/users/login`
+
+### Description
+This endpoint authenticates an existing user. It performs the following:
+- **Validates** the request payload to ensure the email and password meet the required criteria.
+- **Verifies** that the user exists in the database, including a selection of the password field.
+- **Compares** the provided password with the stored hashed password.
+- **Generates** a JSON Web Token (JWT) upon successful authentication.
+
+### Request Body
+
+The endpoint expects a JSON payload in the following format:
+
+```json
+{
+  "email": "user@example.com",          // Required, must be a valid email address
+  "password": "yourPassword"            // Required, minimum length: 6 characters
+}
+```
+
+### Response
+
+#### Success Response
+
+- **Status Code:** `200 OK`
+- **Body:**
+
+    ```json
+    {
+      "token": "generated_jwt_token",
+      "user": {
+        "_id": "user_id",
+        "fullname": {
+          "firstname": "exampleFirstName",
+          "lastname": "exampleLastName"
+        },
+        "email": "user@example.com"
+        // other user fields if applicable...
+      }
+    }
+    ```
+
+#### Error Responses
+
+1. **Validation Error:**
+   - **Status Code:** `400 Bad Request`
+   - **Body:**
+
+      ```json
+      {
+        "errors": [
+          {
+            "msg": "Error message detailing the validation issue",
+            "param": "email or password",
+            "location": "body"
+          }
+          // other errors...
+        ]
+      }
+      ```
+
+2. **Authentication Failure:**
+   - **Status Code:** `401 Unauthorized`
+   - **Body:**
+
+      ```json
+      {
+        "message": "Invalid email or Password"
+      }
+      ```
+
+---
 
 ## Additional Notes
 
-- The request payload is validated using [express-validator](https://express-validator.github.io/docs/).
-- The password is hashed using bcrypt before creating a new user. Refer to [userModel.js](d:\uber\backend\models\userModel.js) for implementation details.
-- The JWT is generated using [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) with a secret key stored in the environment file (.env).
-
-Ensure that you set up the required environment variables in your `.env` file, especially:
-- `DB_CONNECT` (for MongoDB connection)
-- `JWT_SECRET` (for signing JWT tokens)
-- `PORT` (to set the server port)
+- The request payloads are validated using [express-validator](https://express-validator.github.io/docs/).
+- The password is hashed using bcrypt before storing new users, and bcrypt is used again for password comparison during login.
+- JWT tokens are generated with [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) using a secret key specified in your environment configuration.
+- Ensure that the following environment variables are set in your `.env` file:
+  - `DB_CONNECT` (for MongoDB connection)
+  - `JWT_SECRET` (for signing JWT tokens)
+  - `PORT` (to set the server port)
 
 For further information, please check the source at:
 - [server.js](d:\uber\backend\server.js)

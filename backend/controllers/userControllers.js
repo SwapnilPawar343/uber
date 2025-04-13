@@ -4,6 +4,7 @@ const router = express.Router();
 const userService = require("../services/userServices");
 const { validationResult } = require("express-validator");
 const { hash } = require("bcrypt");
+const BlacklistToken = require("../models/blacklistToken");
 
 module.exports.registerUser = async (req, res, next) => {
   const errors = validationResult(req);
@@ -38,5 +39,19 @@ module.exports.loginUser = async (req, res, next) => {
     return res.status(401).json({ message: "Invalid email or Password" });
   }
   const token = user.generateAuthToken();
+  res.cookie("token", token,)
   res.status(200).json({ token, user });
+}
+module.exports.getUserProfile = async (req, res, next) => {
+  const user = await userModel.findById(req.user._id).select('-password');
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+  res.status(200).json({ user });
+}
+module.exports.logoutUser = async (req, res, next) => {
+  res.clearCookie("token");
+  const token = req.cookies.token || req.headers['authorization'].split(' ')[1];
+  await BlacklistToken.create({ token });
+  res.status(200).json({ message: "Logout successfully" });
 }

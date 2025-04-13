@@ -151,6 +151,110 @@ The endpoint expects a JSON payload in the following format:
 
 ---
 
+## Profile Endpoint
+
+### Endpoint
+**GET** `/users/profile`
+
+### Description
+This endpoint retrieves the profile of the currently authenticated user.
+
+### Request Headers
+
+The endpoint requires an authentication token in the `Authorization` header:
+
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+### Response
+
+#### Success Response
+
+- **Status Code:** `200 OK`
+- **Body:**
+
+    ```json
+    {
+      "user": {
+        "_id": "user_id",
+        "fullname": {
+          "firstname": "exampleFirstName",
+          "lastname": "exampleLastName"
+        },
+        "email": "user@example.com"
+        // other user fields if applicable...
+      }
+    }
+    ```
+
+#### Error Responses
+
+1. **Unauthorized Access:**
+   - **Status Code:** `401 Unauthorized`
+   - **Body:**
+
+      ```json
+      {
+        "message": "Authentication required"
+      }
+      ```
+
+2. **User Not Found:**
+   - **Status Code:** `404 Not Found`
+   - **Body:**
+
+      ```json
+      {
+        "message": "User not found"
+      }
+      ```
+
+---
+
+## Logout Endpoint
+
+### Endpoint
+**GET** `/users/logout`
+
+### Description
+This endpoint logs out the currently authenticated user by clearing the authentication token and blacklisting it.
+
+### Request Headers
+
+The endpoint requires an authentication token in the `Authorization` header:
+
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+### Response
+
+#### Success Response
+
+- **Status Code:** `200 OK`
+- **Body:**
+
+    ```json
+    {
+      "message": "Logout successfully"
+    }
+    ```
+
+#### Error Responses
+
+1. **Unauthorized Access:**
+   - **Status Code:** `401 Unauthorized`
+   - **Body:**
+
+      ```json
+      {
+        "message": "Authentication required"
+      }
+      ```
+
+---
+
 ## Additional Notes
 
 - The request payloads are validated using [express-validator](https://express-validator.github.io/docs/).
@@ -166,3 +270,4 @@ For further information, please check the source at:
 - [app.js](d:\uber\backend\app.js)
 - [userControllers.js](d:\uber\backend\controllers\userControllers.js)
 - [userServices.js](d:\uber\backend\services\userServices.js)
+- [userRoute.js](d:\uber\backend\routes\userRoute.js)

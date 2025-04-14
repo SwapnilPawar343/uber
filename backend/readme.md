@@ -8,11 +8,7 @@
 **POST** `/users/register`
 
 #### Description
-This endpoint registers a new user into the system. It performs the following:
-- **Validates** the request payload to ensure all required fields are provided and meet the specified criteria.
-- **Hashes** the provided password using bcrypt before storing the user.
-- **Creates** a new user record in the database.
-- **Generates** a JSON Web Token (JWT) for authentication purposes.
+This endpoint registers a new user into the system.
 
 #### Request Body
 
@@ -23,7 +19,7 @@ This endpoint registers a new user into the system. It performs the following:
     "lastname": "exampleLastName"     // Required, minimum length: 3 characters
   },
   "email": "user@example.com",        // Required, must be a valid email format
-  "password": "yourPassword"          // Required, minimum length: 8 characters
+  "password": "yourPassword"          // Required, minimum length: 6 characters
 }
 ```
 
@@ -298,6 +294,151 @@ This endpoint registers a new captain into the system.
       ```json
       {
         "message": "Captain already exists"
+      }
+      ```
+
+---
+
+### 2. Login Captain
+
+#### Endpoint
+**POST** `/captains/login`
+
+#### Description
+This endpoint authenticates an existing captain.
+
+#### Request Body
+
+```json
+{
+  "email": "captain@example.com",    // Required, must be a valid email address
+  "password": "yourPassword"         // Required, minimum length: 6 characters
+}
+```
+
+#### Response
+
+##### Success Response
+- **Status Code:** `200 OK`
+- **Body:**
+
+    ```json
+    {
+      "token": "generated_jwt_token",
+      "captain": {
+        "_id": "captain_id",
+        "fullname": {
+          "firstname": "exampleFirstName"
+        },
+        "email": "captain@example.com",
+        "vehicle": {
+          "color": "red",
+          "plate": "ABC123",
+          "capacity": 4,
+          "vehicleType": "car"
+        }
+      }
+    }
+    ```
+
+##### Error Responses
+1. **Invalid Credentials:**
+   - **Status Code:** `400 Bad Request`
+   - **Body:**
+
+      ```json
+      {
+        "message": "Invalid credentials"
+      }
+      ```
+
+---
+
+### 3. Get Captain Profile
+
+#### Endpoint
+**GET** `/captains/profile`
+
+#### Description
+This endpoint retrieves the profile of the currently authenticated captain.
+
+#### Request Headers
+
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+#### Response
+
+##### Success Response
+- **Status Code:** `200 OK`
+- **Body:**
+
+    ```json
+    {
+      "captain": {
+        "_id": "captain_id",
+        "fullname": {
+          "firstname": "exampleFirstName"
+        },
+        "email": "captain@example.com",
+        "vehicle": {
+          "color": "red",
+          "plate": "ABC123",
+          "capacity": 4,
+          "vehicleType": "car"
+        }
+      }
+    }
+    ```
+
+##### Error Responses
+1. **Unauthorized Access:**
+   - **Status Code:** `401 Unauthorized`
+   - **Body:**
+
+      ```json
+      {
+        "message": "Authentication required"
+      }
+      ```
+
+---
+
+### 4. Logout Captain
+
+#### Endpoint
+**GET** `/captains/logout`
+
+#### Description
+This endpoint logs out the currently authenticated captain by clearing the authentication token and blacklisting it.
+
+#### Request Headers
+
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+#### Response
+
+##### Success Response
+- **Status Code:** `200 OK`
+- **Body:**
+
+    ```json
+    {
+      "message": "Logged out successfully"
+    }
+    ```
+
+##### Error Responses
+1. **Unauthorized Access:**
+   - **Status Code:** `401 Unauthorized`
+   - **Body:**
+
+      ```json
+      {
+        "message": "Authentication required"
       }
       ```
 

@@ -1,38 +1,35 @@
-# User Endpoints Documentation
+# API Endpoints Documentation
 
-## Registration Endpoint
+## Users Endpoints
 
-### Endpoint
+### 1. Register User
+
+#### Endpoint
 **POST** `/users/register`
 
-> **Note:** Although the prompt mentions `/user/register`, the actual route set in [userRoute.js](d:\uber\backend\routes\userRoute.js) is `/users/register`.
-
-### Description
+#### Description
 This endpoint registers a new user into the system. It performs the following:
 - **Validates** the request payload to ensure all required fields are provided and meet the specified criteria.
 - **Hashes** the provided password using bcrypt before storing the user.
 - **Creates** a new user record in the database.
 - **Generates** a JSON Web Token (JWT) for authentication purposes.
 
-### Request Body
-
-The endpoint expects a JSON payload in the following format:
+#### Request Body
 
 ```json
 {
   "fullname": {
     "firstname": "exampleFirstName",  // Required, minimum length: 3 characters
-    "lastname": "exampleLastName"       // Required, minimum length: 3 characters
+    "lastname": "exampleLastName"     // Required, minimum length: 3 characters
   },
-  "email": "user@example.com",          // Required, must be a valid email format and minimum length of 10 characters
-  "password": "yourPassword"            // Required, minimum length: 8 characters (validated at route level with 6 characters minimum, but defined as 8 in the model)
+  "email": "user@example.com",        // Required, must be a valid email format
+  "password": "yourPassword"          // Required, minimum length: 8 characters
 }
 ```
 
-### Response
+#### Response
 
-#### Success Response
-
+##### Success Response
 - **Status Code:** `201 Created`
 - **Body:**
 
@@ -46,13 +43,11 @@ The endpoint expects a JSON payload in the following format:
           "lastname": "exampleLastName"
         },
         "email": "user@example.com"
-        // other user fields if applicable...
       }
     }
     ```
 
-#### Error Responses
-
+##### Error Responses
 1. **Validation Error:**
    - **Status Code:** `400 Bad Request`
    - **Body:**
@@ -61,47 +56,46 @@ The endpoint expects a JSON payload in the following format:
       {
         "errors": [
           {
-            "msg": "Error message detailing the validation issue",
-            "param": "field name",
+            "msg": "Error message",
+            "param": "field_name",
             "location": "body"
           }
-          // other errors...
         ]
       }
       ```
 
-2. **Missing Fields or Other Validation Failure:**
-   - The endpoint will throw an error with a descriptive message if any required fields (`fullname.firstname`, `fullname.lastname`, `email`, `password`) are missing.
+2. **User Already Exists:**
+   - **Status Code:** `400 Bad Request`
+   - **Body:**
+
+      ```json
+      {
+        "message": "User already exists"
+      }
+      ```
 
 ---
 
-## Login Endpoint
+### 2. Login User
 
-### Endpoint
+#### Endpoint
 **POST** `/users/login`
 
-### Description
-This endpoint authenticates an existing user. It performs the following:
-- **Validates** the request payload to ensure the email and password meet the required criteria.
-- **Verifies** that the user exists in the database, including a selection of the password field.
-- **Compares** the provided password with the stored hashed password.
-- **Generates** a JSON Web Token (JWT) upon successful authentication.
+#### Description
+This endpoint authenticates an existing user.
 
-### Request Body
-
-The endpoint expects a JSON payload in the following format:
+#### Request Body
 
 ```json
 {
-  "email": "user@example.com",          // Required, must be a valid email address
-  "password": "yourPassword"            // Required, minimum length: 6 characters
+  "email": "user@example.com",        // Required, must be a valid email address
+  "password": "yourPassword"          // Required, minimum length: 6 characters
 }
 ```
 
-### Response
+#### Response
 
-#### Success Response
-
+##### Success Response
 - **Status Code:** `200 OK`
 - **Body:**
 
@@ -115,31 +109,12 @@ The endpoint expects a JSON payload in the following format:
           "lastname": "exampleLastName"
         },
         "email": "user@example.com"
-        // other user fields if applicable...
       }
     }
     ```
 
-#### Error Responses
-
-1. **Validation Error:**
-   - **Status Code:** `400 Bad Request`
-   - **Body:**
-
-      ```json
-      {
-        "errors": [
-          {
-            "msg": "Error message detailing the validation issue",
-            "param": "email or password",
-            "location": "body"
-          }
-          // other errors...
-        ]
-      }
-      ```
-
-2. **Authentication Failure:**
+##### Error Responses
+1. **Invalid Credentials:**
    - **Status Code:** `401 Unauthorized`
    - **Body:**
 
@@ -151,26 +126,23 @@ The endpoint expects a JSON payload in the following format:
 
 ---
 
-## Profile Endpoint
+### 3. Get User Profile
 
-### Endpoint
+#### Endpoint
 **GET** `/users/profile`
 
-### Description
+#### Description
 This endpoint retrieves the profile of the currently authenticated user.
 
-### Request Headers
-
-The endpoint requires an authentication token in the `Authorization` header:
+#### Request Headers
 
 ```
 Authorization: Bearer <your_jwt_token>
 ```
 
-### Response
+#### Response
 
-#### Success Response
-
+##### Success Response
 - **Status Code:** `200 OK`
 - **Body:**
 
@@ -183,13 +155,11 @@ Authorization: Bearer <your_jwt_token>
           "lastname": "exampleLastName"
         },
         "email": "user@example.com"
-        // other user fields if applicable...
       }
     }
     ```
 
-#### Error Responses
-
+##### Error Responses
 1. **Unauthorized Access:**
    - **Status Code:** `401 Unauthorized`
    - **Body:**
@@ -212,26 +182,23 @@ Authorization: Bearer <your_jwt_token>
 
 ---
 
-## Logout Endpoint
+### 4. Logout User
 
-### Endpoint
+#### Endpoint
 **GET** `/users/logout`
 
-### Description
+#### Description
 This endpoint logs out the currently authenticated user by clearing the authentication token and blacklisting it.
 
-### Request Headers
-
-The endpoint requires an authentication token in the `Authorization` header:
+#### Request Headers
 
 ```
 Authorization: Bearer <your_jwt_token>
 ```
 
-### Response
+#### Response
 
-#### Success Response
-
+##### Success Response
 - **Status Code:** `200 OK`
 - **Body:**
 
@@ -241,8 +208,7 @@ Authorization: Bearer <your_jwt_token>
     }
     ```
 
-#### Error Responses
-
+##### Error Responses
 1. **Unauthorized Access:**
    - **Status Code:** `401 Unauthorized`
    - **Body:**
@@ -255,19 +221,98 @@ Authorization: Bearer <your_jwt_token>
 
 ---
 
+## Captains Endpoints
+
+### 1. Register Captain
+
+#### Endpoint
+**POST** `/captains/register`
+
+#### Description
+This endpoint registers a new captain into the system.
+
+#### Request Body
+
+```json
+{
+  "fullname": {
+    "firstname": "exampleFirstName"  // Required, minimum length: 3 characters
+  },
+  "email": "captain@example.com",    // Required, must be a valid email format
+  "password": "yourPassword",        // Required, minimum length: 6 characters
+  "vehicle": {
+    "color": "red",                  // Required, minimum length: 3 characters
+    "plate": "ABC123",               // Required, minimum length: 3 characters
+    "capacity": 4,                   // Required, must be an integer greater than or equal to 1
+    "vehicleType": "car"             // Required, must be one of ["car", "motorcycle", "auto"]
+  }
+}
+```
+
+#### Response
+
+##### Success Response
+- **Status Code:** `201 Created`
+- **Body:**
+
+    ```json
+    {
+      "token": "generated_jwt_token",
+      "captain": {
+        "_id": "captain_id",
+        "fullname": {
+          "firstname": "exampleFirstName"
+        },
+        "email": "captain@example.com",
+        "vehicle": {
+          "color": "red",
+          "plate": "ABC123",
+          "capacity": 4,
+          "vehicleType": "car"
+        }
+      }
+    }
+    ```
+
+##### Error Responses
+1. **Validation Error:**
+   - **Status Code:** `400 Bad Request`
+   - **Body:**
+
+      ```json
+      {
+        "errors": [
+          {
+            "msg": "Error message",
+            "param": "field_name",
+            "location": "body"
+          }
+        ]
+      }
+      ```
+
+2. **Captain Already Exists:**
+   - **Status Code:** `400 Bad Request`
+   - **Body:**
+
+      ```json
+      {
+        "message": "Captain already exists"
+      }
+      ```
+
+---
+
 ## Additional Notes
 
-- The request payloads are validated using [express-validator](https://express-validator.github.io/docs/).
-- The password is hashed using bcrypt before storing new users, and bcrypt is used again for password comparison during login.
-- JWT tokens are generated with [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken) using a secret key specified in your environment configuration.
-- Ensure that the following environment variables are set in your `.env` file:
-  - `DB_CONNECT` (for MongoDB connection)
-  - `JWT_SECRET` (for signing JWT tokens)
-  - `PORT` (to set the server port)
+- All endpoints requiring authentication use JWT tokens.
+- Ensure the following environment variables are set in your `.env` file:
+  - `DB_CONNECT` (MongoDB connection string)
+  - `JWT_SECRET` (secret key for signing JWT tokens)
+  - `PORT` (server port)
 
-For further information, please check the source at:
-- [server.js](d:\uber\backend\server.js)
-- [app.js](d:\uber\backend\app.js)
+For further details, refer to the source files:
 - [userControllers.js](d:\uber\backend\controllers\userControllers.js)
-- [userServices.js](d:\uber\backend\services\userServices.js)
+- [captainController.js](d:\uber\backend\controllers\captainController.js)
 - [userRoute.js](d:\uber\backend\routes\userRoute.js)
+- [captainRoutes.js](d:\uber\backend\routes\captainRoutes.js)

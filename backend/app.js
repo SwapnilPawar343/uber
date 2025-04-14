@@ -1,6 +1,7 @@
 const dotenv =require('dotenv');
 dotenv.config();
 const userRoute=require('./routes/userRoute');
+const captainRoute=require('./routes/captainRoutes');
 const express = require('express')
 const cors=require('cors');
 const app = express();
@@ -15,5 +16,6 @@ app.get('/', (req, res) => res.send('Hello World!'));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use('/users',userRoute);
+app.use('/captains',captainRoute);
 module.exports=app;
 

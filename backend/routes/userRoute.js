@@ -3,7 +3,6 @@ const { validationResult } = require('express-validator');
 const router = express.Router();
 const {body} = require('express-validator');
 const userController = require('../controllers/userControllers');
-const { route } = require('../app');
 const { authUser } = require('../middlewares/authMiddleware');
 
 
